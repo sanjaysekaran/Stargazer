@@ -1,3 +1,3 @@
-# Data-Team-Codes
+# Projects
 
-This repository contains all of the relevant python codes for the processing, analysis and modelling of the Surface-Enhanced Raman Spectroscopic (SERS) data.
+This repository contains codes for processing, analysis and modelling of the Surface-Enhanced Raman Spectroscopic (SERS) data of human breathomes.
