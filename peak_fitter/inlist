@@ -1,0 +1,3 @@
+INPUT_FOLDER_PATH = /lhome/sanjay/Downloads/SilverFactory/QC/Compiled/
+RESULTS_FOLDER_PATH = /lhome/sanjay/Downloads/SilverFactory/QC/Fit_Results/
+RESUME = False

@@ -1,0 +1,9 @@
+INPUT_FOLDER_PATH = /lhome/sanjay/Downloads/SilverFactory/QC/
+OUTPUT_FOLDER_PATH = /lhome/sanjay/Downloads/SilverFactory/QC/
+SPECTROMETER = Zolix
+RESOLUTION = 2.0
+PROBE_ORDER = 1,2,4,5,6
+TYPE = QC
+DATA_TYPE = QC_NEW
+INPUT_TYPE = MSG
+OUTPUT_TYPE = CSV

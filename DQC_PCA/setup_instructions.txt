@@ -1,0 +1,7 @@
+To setup this code properly (I will assume that you have a working python installation):
+
+1) Open anaconda prompt, then type 'cd C:\\home\Desktop\DQC_PCA\' (or wherever you unzipped the code).
+
+2) Type 'pip install -r requirements.txt'. This will install all necessary packages for you to run the code.
+
+3) After all packages are installed, you are ready to run the code: type 'python Dispensing_QC_param_PCA.py peak_ranges 1,4,6'  in your terminal (i.e. anaconda prompt for Windows users)
