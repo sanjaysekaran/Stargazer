@@ -1,7 +1,9 @@
 # Overview
 
 This script performs the fitting of the peaks of the spectra of individual probes that have been saved in msgpack format. Each peak is fitted using a skewed pseudo-voigt (a sum of a Gaussian and Lorentzian rather than a convolution) profile as per many studies in the literature, which is described by a five parameters: amplitude, peak center, width, skewness, and the Gaussian and Lorentzian proportion (alpha). However, for the sake of interpretability/comparability,
-the output parameters include only the fraction and skewness, with the intensity, position and fwhm calculated from the deconvoled model peaks individually. The spectra of the individual probes is generated using the script `raw_json_processing.py`, so run that first before using this script. Requires the lmfit, numdifftools, mpi4py, mpipool, str2bool and msgpack python packages. These can be convieniently installed by using the command `pip install -r requirements.txt`, where `requirements.txt` is a text file distributed along with this script. Note that mpi4py installation is non-trivial on windows, so please look into installing and configuring Microsoft MPI before attempting to use this script.
+the output parameters include only the fraction and skewness, with the intensity, position, fwhm and asym (!) calculated from the deconvoled model peaks individually. The spectra of the individual probes is generated using the script `raw_json_processing.py`, so run that first before using this script. Requires the lmfit, numdifftools, mpi4py, mpipool, str2bool and msgpack python packages. These can be convieniently installed by using the command `pip install -r requirements.txt`, where `requirements.txt` is a text file distributed along with this script. Note that mpi4py installation is non-trivial on windows, so please look into installing and configuring Microsoft MPI before attempting to use this script.
+
+(!) asym  = the distance from the peak maximum position to the right wing - distance of from the peak center to the left wing as a fraction of the FWHM (i.e. negative values for left-tailed peaks, and positive values for right-tailed peaks)
 
 # How to run
 
