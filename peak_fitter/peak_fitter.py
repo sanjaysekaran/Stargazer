@@ -4,14 +4,17 @@ that have been saved in msgpack format. Each peak is fitted using a skewed pseud
 (a sum of a Gaussian and Lorentzian rather than a convolution) profile as per many studies in the literature,
 which is described by a five parameters: amplitude, peak center, width, skewness, and
 the Gaussian and Lorentzian proportion (alpha). However, for the sake of interpretability/comparability,
-the output parameters include only the fraction and skewness, with the intensity, position and fwhm calculated from the
-deconvoled model peaks individually.The spectra of the individual probes is generated using the script
+the output parameters include only the fraction, with the intensity, position, fwhm and asym (!) calculated
+from the deconvoled model peaks individually.The spectra of the individual probes is generated using the script
 raw_json_processing.py, so run that first before using this script.
 Requires the lmfit, numdifftools, mpi4py, mpipool, str2bool and msgpack python packages.
 These can be convieniently installed by using the command pip install -r requirements.txt, where
 requirements.txt is a text file distributed along with this script. Note that mpi4py installation
 is non-trivial on windows, so please look into installing and configuring Microsoft MPI before
 attempting to use this script.
+
+(!) asym  = the distance from the peak maximum position to the right wing - distance of from the peak center to the
+left wing as a fraction of the FWHM (i.e. negative values for left-tailed peaks, and positive values for right-tailed peaks)
 
 This script must be executed parallel functionality (i.e. can make use of multiple CPU cores on multiple machines)!
 To execute a parallel computation on 4 cores (e.g. on a laptop), use the command mpiexec -n 4 python peak_fitter.py inlist peak_ranges,
@@ -274,7 +277,7 @@ def peak_data(peak_params, peak_profiles, result, x_data, pn):
         pp.append([x_grid,profiles[profile]])
         peak_profiles.append([x_grid,profiles[profile]])
 
-    no_save_list = ['amplitude', 'center', 'sigma', 'height']
+    no_save_list = ['amplitude', 'center', 'sigma', 'height', 'skew']
 
     for ind, id in enumerate(peak_id):
         pn = pn + 1 #Add 1 to peak number for every unique peak id
@@ -283,18 +286,24 @@ def peak_data(peak_params, peak_profiles, result, x_data, pn):
         y = pp[ind][1]
         position = x[np.argmax(y)]
         intensity = np.max(y)
-        FWHM = peak_widths(y,peaks=[np.argmax(y)])[0][0]*x_grid_res
+        pw = peak_widths(y,peaks=[np.argmax(y)])
+        FWHM = pw[0][0]*x_grid_res
+        fwhm_left, fwhm_right = np.abs(np.min(x) + np.concatenate(pw[2:])*x_grid_res - position)
+        ASYM = (fwhm_right-fwhm_left)/FWHM #Use same convention as skewness: positive when RHS>LHS and vice versa
         result.params.add(str(id) + '_position', value=position)
         result.params.add(str(id) + '_intensity', value=intensity)
         result.params.add(str(id) + '_fwhm', value=FWHM)
-        #Include parameter errors from center, height and sigma
+        result.params.add(str(id) + '_asym', value=ASYM)
+        #Propagate parameter errors from center, height and sigma
         result.params[str(id) + '_position'].stderr = result.params[str(id) + '_center'].stderr
         result.params[str(id) + '_intensity'].stderr = result.params[str(id) + '_height'].stderr
         #Catch Nonetype errors
         if result.params[str(id) + '_sigma'].stderr is not None:
             result.params[str(id) + '_fwhm'].stderr = 2.355*result.params[str(id) + '_sigma'].stderr
+            result.params[str(id) + '_asym'].stderr = result.params[str(id) + '_asym']*(result.params[str(id) + '_fwhm'].stderr/result.params[str(id) + '_fwhm'])
         else:
             result.params[str(id) + '_fwhm'].stderr = result.params[str(id) + '_sigma'].stderr
+            result.params[str(id) + '_asym'].stderr = result.params[str(id) + '_sigma'].stderr
         for param in result.params:
             if all([unsave not in param for unsave in no_save_list]):
                 if id in param:
